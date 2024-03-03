@@ -13,7 +13,8 @@ Bellow is a step by step guide of what the application does
 ## Set up
 
 NB: Host machine must have docker and docker-compose installed
- 
+NB: Maintain same code structure, NotificationService and UserService are being referenced in the docker-compose.yml file
+
 - run "docker-compose up", this usually take a few minutes.
 - Using any testing tool e.g postman, create a user, api is - http://127.0.0.1:8081/api/users
 - Check daily logs on the NotificationService for the user that was just created.
