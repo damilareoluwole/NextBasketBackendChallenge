@@ -1,0 +1,58 @@
+version: '3'
+services:
+  userservice:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    volumes:
+      - "./UserService:/var/www/html"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+      - activemq
+    networks:
+      - mynetwork
+    command: ["bash", "-c", "cp .env.example .env && composer install && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8081"]
+
+  notificationservice:
+    build:
+      context: ./NotificationService
+      dockerfile: Dockerfile
+    volumes:
+      - "./NotificationService:/var/www/html"
+    ports:
+      - "8082:8082"
+    networks:
+      - mynetwork
+    command: ["bash", "-c", "cp .env.example .env && composer install && php artisan Queue-Notification:Listener"]
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: challenge
+      MYSQL_USER: dami
+      MYSQL_PASSWORD: damilare
+    networks:
+      - mynetwork
+
+  activemq:
+    image: apache/activemq-artemis:latest-alpine
+    ports:
+      - "61617:61616"
+      - "8162:8162"
+    environment:
+      ANONYMOUS_LOGIN: "true"
+      ACTIVEMQ_USER: "admin"
+      ACTIVEMQ_PASSWORD: "admin"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+  default:
